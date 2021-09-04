@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  rtsp-simple-server:
+    image: "aler9/rtsp-simple-server"
+    environment: 
+      RTSP_PROTOCOLS: "tcp"
+    ports:
+      - "8554:8554"
+      - "1935:1935"
+      - "9997:9997"
+      - "9998:9998"
+    volumes:
+      - ./rtsp-simple-server.yml:/rtsp-simple-server.yml
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9000:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  prometheus-data:
+  grafana-data:
